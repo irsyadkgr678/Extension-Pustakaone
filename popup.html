@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PustakaONE Proxy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+  <style>
+    :root {
+      --primary: #3b82f6;
+      --primary-glow: rgba(59, 130, 246, 0.5);
+      --success: #10b981;
+      --success-glow: rgba(16, 185, 129, 0.4);
+      --danger: #ef4444;
+      --bg: #0f172a;
+      --card-bg: rgba(255, 255, 255, 0.03);
+      --border: rgba(255, 255, 255, 0.08);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 320px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: #f8fafc;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .app-container {
+      padding: 24px;
+      position: relative;
+    }
+
+    /* Background Glows */
+    .glow {
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      filter: blur(60px);
+      z-index: -1;
+      opacity: 0.15;
+    }
+
+    .glow-1 { top: -50px; right: -50px; background: var(--primary); }
+    .glow-2 { bottom: -50px; left: -50px; background: #8b5cf6; }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .logo-box {
+      width: 40px;
+      height: 40px;
+      background: white;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+      padding: 4px;
+    }
+
+
+    .header h1 {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(to right, #fff, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .status-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .status-card.active {
+      border-color: rgba(16, 185, 129, 0.3);
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.1);
+    }
+
+    .indicator {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      position: relative;
+    }
+
+    .indicator::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      transition: all 0.5s ease;
+    }
+
+    .active .indicator::after {
+      border-color: var(--success);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 0.5; }
+      50% { transform: scale(1.1); opacity: 0.2; }
+      100% { transform: scale(1); opacity: 0.5; }
+    }
+
+    .indicator .material-symbols-outlined {
+      font-size: 32px;
+      color: #64748b;
+      transition: all 0.3s ease;
+    }
+
+    .active .indicator .material-symbols-outlined {
+      color: var(--success);
+      font-variation-settings: 'FILL' 1;
+    }
+
+    .status-text {
+      font-weight: 700;
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+
+    .info-text {
+      font-size: 13px;
+      color: #94a3b8;
+      line-height: 1.5;
+    }
+
+    .btn-stop {
+      width: 100%;
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.3s;
+      margin-bottom: 16px;
+    }
+
+    .btn-stop:hover {
+      background: var(--danger);
+      color: white;
+      transform: translateY(-2px);
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .version {
+      font-size: 10px;
+      font-weight: 600;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge {
+      font-size: 10px;
+      padding: 4px 8px;
+      background: rgba(59, 130, 246, 0.1);
+      color: var(--primary);
+      border-radius: 6px;
+      font-weight: 700;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app-container">
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+
+    <div class="header">
+      <div class="logo-box">
+        <img src="icon128.png" alt="PustakaONE" style="width: 28px; height: 28px; object-fit: contain;">
+      </div>
+      <h1>PustakaONE</h1>
+    </div>
+
+
+    <div id="statusCard" class="status-card">
+      <div class="indicator">
+        <span id="statusIcon" class="material-symbols-outlined">lock</span>
+      </div>
+      <div id="statusText" class="status-text">Terkunci</div>
+      <div id="infoText" class="info-text">
+        Silakan login ke Dashboard PustakaONE untuk mengaktifkan akses otomatis.
+      </div>
+    </div>
+
+    <button id="btnStop" class="btn-stop" style="display: none;">
+      <span class="material-symbols-outlined" style="font-size: 18px;">power_settings_new</span>
+      Putuskan Koneksi
+    </button>
+
+    <div class="footer">
+      <div class="version">v1.2.0 Build</div>
+      <div class="badge">SECURE GATEWAY</div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+
+</html>
+
+
+</html>
