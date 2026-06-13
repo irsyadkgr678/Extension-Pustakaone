@@ -1,5 +1,5 @@
-const PROXY_HOST = "180.250.135.17";
-const PROXY_PORT = 3128;
+const PROXY_HOST = "180.xxx.xxx.xx";
+const PROXY_PORT = 31xx;
 const ALLOWED_DOMAINS = [
   "103.247.11.197",
   "10.30.1.47",
