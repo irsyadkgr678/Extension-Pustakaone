@@ -205,6 +205,94 @@
       border-radius: 6px;
       font-weight: 700;
     }
+
+    /* Institution Info Card */
+    .inst-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .inst-card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .inst-icon {
+      width: 36px;
+      height: 36px;
+      background: rgba(59, 130, 246, 0.1);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .inst-icon .material-symbols-outlined {
+      font-size: 20px;
+      color: var(--primary);
+    }
+
+    .inst-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    #instName {
+      font-size: 14px;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+
+    #instMethod {
+      font-size: 11px;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+
+    .btn-detect {
+      width: 100%;
+      background: rgba(59, 130, 246, 0.08);
+      color: #93c5fd;
+      border: 1px solid rgba(59, 130, 246, 0.15);
+      padding: 10px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.3s;
+    }
+
+    .btn-detect:hover {
+      background: rgba(59, 130, 246, 0.15);
+      border-color: rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-detect:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .spin {
+      animation: spin 1s linear infinite;
+    }
   </style>
 </head>
 
@@ -229,6 +317,24 @@
       <div id="infoText" class="info-text">
         Silakan login ke Dashboard PustakaONE untuk mengaktifkan akses otomatis.
       </div>
+    </div>
+
+    <!-- Institution Info -->
+    <div class="inst-card">
+      <div class="inst-card-header">
+        <div class="inst-icon">
+          <span class="material-symbols-outlined">school</span>
+        </div>
+        <div>
+          <div class="inst-label">Institusi Aktif</div>
+          <div id="instName">Telkom University</div>
+          <div id="instMethod">🔍 Mendeteksi...</div>
+        </div>
+      </div>
+      <button id="btnDetect" class="btn-detect">
+        <span id="detectIcon" class="material-symbols-outlined" style="font-size: 16px;">network_check</span>
+        <span id="detectText">Deteksi Ulang Jaringan</span>
+      </button>
     </div>
 
     <button id="btnStop" class="btn-stop" style="display: none;">
