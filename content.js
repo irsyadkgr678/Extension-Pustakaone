@@ -9,7 +9,56 @@ console.log("[PustakaONE Extension] Content script loaded di:", window.location.
 document.documentElement.setAttribute("data-pustakaone-extension", "true");
 
 let lastLoginStatus = null;
+let lastReportedInstitution = null;
 let intervalId = null;
+
+/**
+ * Deteksi institusi dari halaman PustakaONE (DOM).
+ * Mencari nama institusi di sidebar atau elemen halaman.
+ */
+function detectInstitutionFromPage() {
+  try {
+    const stored = localStorage.getItem("selectedInstitution");
+    if (stored && stored !== "null" && stored !== "undefined") return stored;
+
+    const userRaw = localStorage.getItem("user");
+    if (userRaw) {
+      const user = JSON.parse(userRaw);
+      if (user.email) {
+        if (user.email.includes("@undip.ac.id")) return "Universitas Diponegoro";
+        if (user.email.includes("@telkomuniversity.ac.id") || user.email.includes("@student.telkomuniversity.ac.id")) return "Telkom University";
+        if (user.email.includes("@ui.ac.id")) return "Universitas Indonesia";
+      }
+      if (user.institution) return user.institution;
+      if (user.institution_name) return user.institution_name;
+    }
+
+    const headers = document.querySelectorAll('h1, h2, h3, [class*="sidebar"] h2, [class*="Sidebar"] h2, [class*="institution"], [class*="Institution"]');
+    for (const el of headers) {
+      const text = el.textContent?.trim() || '';
+      if (text.includes('Universitas Diponegoro') || text.includes('Undip')) return 'Universitas Diponegoro';
+      if (text.includes('Telkom University')) return 'Telkom University';
+      if (text.includes('Universitas Indonesia')) return 'Universitas Indonesia';
+    }
+  } catch (e) { /* ignore */ }
+  return null;
+}
+
+function reportInstitution() {
+  try {
+    if (!chrome.runtime || !chrome.runtime.id) return;
+    const institution = detectInstitutionFromPage();
+    if (institution && institution !== lastReportedInstitution) {
+      lastReportedInstitution = institution;
+      chrome.runtime.sendMessage({
+        action: "reportInstitution",
+        institution: institution,
+        source: "content-script-dom"
+      }, () => { if (chrome.runtime.lastError) { /* ignore */ } });
+      console.log("[PustakaONE Extension] Melaporkan institusi dari halaman:", institution);
+    }
+  } catch (err) { /* ignore */ }
+}
 
 // Fungsi untuk lapor status login ke background
 function reportLoginStatus() {
@@ -33,19 +82,17 @@ function reportLoginStatus() {
                           hostname === "127.0.0.1";
     
     if (isPustakaSite) {
-      // Hanya kirim pesan jika status berubah untuk menghindari spam
       if (lastLoginStatus !== isLoggedIn) {
         chrome.runtime.sendMessage({
           action: "reportAppState",
           loggedIn: isLoggedIn
         }, () => {
-          if (chrome.runtime.lastError) {
-            // Abaikan error secara diam-diam
-          }
+          if (chrome.runtime.lastError) { /* ignore */ }
         });
         console.log("[PustakaONE Extension] Melaporkan status login:", isLoggedIn);
         lastLoginStatus = isLoggedIn;
       }
+      reportInstitution();
     }
   } catch (err) {
     // Tangkap "Extension context invalidated" yang dilempar oleh Chrome API
@@ -74,13 +121,16 @@ window.addEventListener("message", (event) => {
   // Hanya terima pesan dari website PustakaONE
   if (event.data && event.data.type === "PUSTAKAONE_OPEN_PUBLISHER") {
     const url = event.data.url;
-    console.log("[PustakaONE Extension] Menerima perintah buka publisher:", url);
+    const institution = event.data.institution 
+      || localStorage.getItem("selectedInstitution") 
+      || "Telkom University";
+    console.log("[PustakaONE Extension] Menerima perintah buka publisher:", url, "| institusi:", institution);
 
-    // Kirim ke background.js untuk aktifkan proxy lalu buka URL
     try {
       chrome.runtime.sendMessage({
         action: "enableAndOpen",
-        url: url
+        url: url,
+        institution: institution
       }, (response) => {
         if (chrome.runtime.lastError) {
           console.error("[PustakaONE Extension] Error:", chrome.runtime.lastError.message);
@@ -102,4 +152,5 @@ window.addEventListener("message", (event) => {
     }
   }
 });
+
 
